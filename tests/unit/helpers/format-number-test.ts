@@ -137,19 +137,6 @@ module('format-number', function (hooks) {
     assert.equal(this.element.textContent, '0,000,000,001.00', 'should return a string formatted to a percent');
   });
 
-  // v4 -> v5 regression
-  // https://github.com/ember-intl/ember-intl/pull/1401
-  test('hash options take precedence over named format options', async function (this: TestContext, assert) {
-    assert.expect(1);
-    this.intl.set('formats', {
-      number: { currency: { style: 'currency', currency: 'USD', minimumFractionDigits: 3 } },
-    });
-    await render(
-      hbs`{{format-number 1 format="currency"}} / {{format-number 1 format="currency" minimumFractionDigits=0}}`
-    );
-    assert.equal(this.element.textContent, '$1.000 / $1', '`minimumFractionDigits` overrides named format');
-  });
-
   test('used to format percentages', async function (this: TestContext, assert) {
     assert.expect(2);
     await render(hbs`{{format-number 400 style="percent"}}`);

@@ -3,8 +3,8 @@ import type { Formats } from 'ember-intl/types';
 const hhmmss = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
 
 const formats: Formats = {
-  date: { hhmmss: hhmmss },
-  time: { hhmmss: hhmmss },
+  date: { hhmmss },
+  time: { hhmmss },
   number: {
     compact: { notation: 'compact' },
     EUR: { style: 'currency', currency: 'EUR' },

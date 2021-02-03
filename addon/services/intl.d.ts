@@ -33,7 +33,7 @@ export default class IntlService extends Service.extend(Evented) {
   /**
    * @public
    */
-  readonly formats: Formats;
+  formats: Formats;
 
   /**
    * Returns an array of registered locale names

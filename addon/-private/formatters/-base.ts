@@ -22,6 +22,8 @@ export interface BaseOptions {
   format?: string;
 }
 
+type NamedFormats = Omit<Formats, 'base' | 'defaults'>;
+
 /**
  * @private
  * @hide
@@ -31,7 +33,7 @@ export default abstract class FormatterBase<KnownOptions extends {}> {
   protected readonly config: FormatterConfig;
   protected readonly readFormatConfig: () => Formats;
 
-  static type: keyof Formats;
+  static type: keyof NamedFormats;
 
   protected abstract readonly createNativeFormatter: (
     locales: string | string[],
@@ -75,19 +77,29 @@ export default abstract class FormatterBase<KnownOptions extends {}> {
     return found;
   }
 
-  readOptions<O extends BaseOptions & KnownOptions>(formatOptions?: O) {
-    let formatterOptions = this.filterKnownOptions(formatOptions);
+  readOptions<O extends BaseOptions & KnownOptions>(formatOptions?: O): KnownOptions {
+    const { base, defaults } = this.getBaseAndDefaultFormat();
+    const knownOptions = this.filterKnownOptions(formatOptions);
 
-    if (formatOptions && 'format' in formatOptions) {
-      const namedFormatsOptions = this.getNamedFormat((formatOptions as BaseOptions).format!);
+    if (formatOptions?.format) {
+      // If a named `format` was specified, merge it with the other known
+      // options, if any.
+      const namedFormatsOptions = this.getNamedFormat(formatOptions.format);
 
-      formatterOptions = {
+      return {
+        ...base,
         ...namedFormatsOptions,
-        ...formatterOptions,
+        ...knownOptions,
       };
+    } else if (Object.keys(knownOptions).length === 0) {
+      // If neither a named `format` nor any known options were specified, use
+      // the default format for the type, if specified.
+      return { ...base, ...defaults } as KnownOptions;
     }
 
-    return formatterOptions;
+    // If known options are provided, but no named format, just merge them with
+    // the base option.
+    return { ...base, ...knownOptions };
   }
 
   validateFormatterOptions(locale: string | string[], _formatterOptions: BaseOptions & KnownOptions): void {
@@ -103,13 +115,22 @@ export default abstract class FormatterBase<KnownOptions extends {}> {
     }
   }
 
-  getNamedFormat(key: string): void | ValueOf<ValueOf<Required<Formats>>> {
+  getNamedFormat(key: string): void | ValueOf<ValueOf<Required<NamedFormats>>> {
     const formats = this.readFormatConfig();
     const namedFormatsForType = formats[(this.constructor as typeof FormatterBase).type];
 
     if (namedFormatsForType && namedFormatsForType[key]) {
       return namedFormatsForType[key];
     }
+  }
+
+  getBaseAndDefaultFormat(): {
+    base: ValueOf<Required<Formats>['base']>;
+    defaults: ValueOf<Required<Formats>['defaults']>;
+  } {
+    const { base, defaults } = this.readFormatConfig();
+    const { type } = this.constructor as typeof FormatterBase;
+    return { base: base?.[type], defaults: defaults?.[type] };
   }
 
   abstract format(
