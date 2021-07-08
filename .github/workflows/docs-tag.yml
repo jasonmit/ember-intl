@@ -26,7 +26,7 @@ jobs:
           # https://github.com/actions/checkout/blob/61b9e3751b92087fd0b06925ba6dd6314e06f089/src/git-auth-helper.ts#L252-L278
           git config --global "http.https://github.com/.extraheader" \
             "$(git config --local --get http.https://github.com/.extraheader)"
-      - uses: actions/setup-node@v2.1.5
+      - uses: actions/setup-node@v2.2.0
         with:
           node-version: '14'
       - name: Install Dependencies
