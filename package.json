@@ -102,7 +102,7 @@
     "ember-open-browser": "^1.0.0",
     "ember-resolver": "^8.0.2",
     "ember-root-url": "^0.2.0",
-    "ember-source": "~3.25.1",
+    "ember-source": "~3.27.5",
     "ember-source-channel-url": "^3.0.0",
     "ember-try": "^1.4.0",
     "eslint": "^7.20.0",
